@@ -1,0 +1,106 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Docker build and push
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+  # Or maybe only when releasing:
+  #push:
+  #  tags:
+  #    - '*'
+
+jobs:
+  docker-build-push:
+    # https://docs.github.com/en/actions/reference/environments#about-environments
+    environment: prod
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Map a step output to a job output
+    # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idoutputs
+    outputs:
+      image-uri: ${{ steps.push.outputs.image-uri }}
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_ECR_ACCESS_KEY_SECRET }}
+          aws-region: eu-west-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0' # Recommended to use by https://github.com/anothrNick/github-tag-action/blame/master/README.md#L35
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: push
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ykctlone-okctl-kotlin-app-template
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        working-directory: .
+
+  update-tag:
+    needs: docker-build-push
+
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job.
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Repository name with owner. For example, actions/checkout
+          # Default: ${{ github.repository }}
+          repository: 'oslokommune/ykctlone'
+          ref: 'main'
+          ssh-key: '${{ secrets.CLUSTER_DEPLOY_KEY }}'
+
+      - uses: webfactory/ssh-agent@v0.5.2
+        with:
+          ssh-private-key: ${{ secrets.CLUSTER_DEPLOY_KEY }}
+
+      - name: Update IAC repo with image
+        env:
+          # TODO move this to somewhere else, higher up in the chain
+          CONTAINER_NAME: okctl-kotlin-app-template-dev
+          IMAGE_TAG: ${{ github.sha }}
+          DEPLOYMENT_YAML_FILE: infrastructure/applications/okctl-kotlin-app-template-dev/base/deployment.yaml
+        run: |
+          # Update image tag
+          sudo snap install yq
+
+          image=$(yq eval '.spec.template.spec.containers[select(.name == "'$CONTAINER_NAME'")].image' $DEPLOYMENT_YAML_FILE)
+
+          if [[ "$image" == *":"* ]]; then
+            tag=$(echo $image | cut -d ":" -f2)
+            newimage=$(sed "s#$tag#$IMAGE_TAG#" <<< $image)
+            sed -i "s#$image#$newimage#" $DEPLOYMENT_YAML_FILE
+          else
+           sed -i "s#$image#$image:$IMAGE_TAG#" $DEPLOYMENT_YAML_FILE
+          fi
+
+          # Update IAC repository
+          git config --global user.email "no-reply@origo.oslo.kommune.no"
+          git config --global user.name "Github actions"
+
+          git add $DEPLOYMENT_YAML_FILE
+          git commit -m "Update deployment.yaml image tag"
+          git push
+
+        working-directory: .
+
