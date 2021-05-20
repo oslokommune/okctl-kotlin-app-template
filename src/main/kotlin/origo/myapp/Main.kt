@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.application.*
 import io.ktor.features.*
+import io.ktor.http.*
 import io.ktor.jackson.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import mu.KotlinLogging
+import java.io.File
 
 private val logger = KotlinLogging.logger {}
 
@@ -22,13 +24,19 @@ fun Application.main() {
         }
     }
 
+    val html = File("index.html").readText()
+
     routing {
         get("/health") {
             call.respond(mapOf("OK" to "true"))
         }
 
         get("/") {
-            call.respond(mapOf("hello2" to "world2"))
+            call.respond(mapOf("hello3" to "world2"))
+        }
+
+        get("/test") {
+            call.respondText(html, ContentType.Text.Html)
         }
     }
 
