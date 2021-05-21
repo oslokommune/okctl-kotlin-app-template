@@ -67,9 +67,9 @@ jobs:
       - name: Update IAC repo with image
         env:
           # TODO move this to somewhere else, higher up in the chain
-          CONTAINER_NAME: okctl-kotlin-app-template-dev
+          CONTAINER_NAME: kotlin-test-app
           IMAGE_TAG: ${{ github.sha }}
-          DEPLOYMENT_YAML_FILE: infrastructure/applications/okctl-kotlin-app-template-dev/base/deployment.yaml
+          DEPLOYMENT_YAML_FILE: infrastructure/applications/kotlin-test-app/base/deployment.yaml
         run: |
           # Update image tag
           sudo snap install yq
