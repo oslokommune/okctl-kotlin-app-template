@@ -56,7 +56,7 @@ jobs:
         with:
           # Repository name with owner. For example, actions/checkout
           # Default: ${{ github.repository }}
-          repository: 'oslokommune/ykctlone'
+          repository: 'oslokommune/ivar-okctl-dev'
           ref: 'main'
           ssh-key: '${{ secrets.CLUSTER_DEPLOY_KEY }}'
 
