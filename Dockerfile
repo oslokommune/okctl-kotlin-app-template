@@ -26,5 +26,6 @@ RUN adduser --ingroup $APP_USER --system --home /home/$APP_USER --uid 1001 $APP_
 USER $APP_USER
 
 COPY --from=builder /home/gradle/build/libs/gradle-0.0.1-SNAPSHOT-all.jar /app.jar
+COPY index.html .
 
 CMD [ "java", "-jar", "-Djava.security.egd=file:/dev/./urandom", "/app.jar" ]
