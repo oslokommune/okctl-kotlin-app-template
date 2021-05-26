@@ -69,12 +69,11 @@ jobs:
           # TODO move this to somewhere else, higher up in the chain
           CONTAINER_NAME: kotlin-test-app
           IMAGE_TAG: ${{ github.sha }}
-          DEPLOYMENT_YAML_FILE: infrastructure/applications/kotlin-test-app/base/deployment.yaml
+          DEPLOYMENT_YAML_FILE: infrastructure/applications/kotlin-test-app/overlays/ivardevokctla/deployment-patch.json
         run: |
           # Update image tag
-          sudo snap install yq
-
-          image=$(yq eval '.spec.template.spec.containers[select(.name == "'$CONTAINER_NAME'")].image' $DEPLOYMENT_YAML_FILE)
+          sudo snap install jq
+          image=$(jq -r '.[] | select(.path=="/spec/template/spec/containers/0/image").value' ${DEPLOYMENT_YAML_FILE})
 
           if [[ "$image" == *":"* ]]; then
             tag=$(echo $image | cut -d ":" -f2)
