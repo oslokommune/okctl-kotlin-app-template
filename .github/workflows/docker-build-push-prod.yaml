@@ -5,13 +5,8 @@ name: Docker build and push
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
-
-  # Or maybe only when releasing:
-  #push:
-  #  tags:
-  #    - '*'
+    tags:
+      - '*'
 
 jobs:
   docker-build-push:
