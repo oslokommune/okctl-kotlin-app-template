@@ -3,11 +3,7 @@
 Run:
 
 ```shell
-./gradlew run
-
-# Or, run with Docker:
-docker build . --tag myapp
-docker run -p 8080:8080 myapp
+make run
 ```
 
 
@@ -23,6 +19,6 @@ Run tests
 
 # Deploy
 
-Push a new commit to main.
-
-TODO: To make deploy work, we need to push to okctl IAC repo with new image tag.
+TODO:
+* Explain how to setup github secrets to make github actions work.
+* Explain or refer to doc how ArgoCD deploys
