@@ -74,7 +74,7 @@ jobs:
           # TODO move this to somewhere else, higher up in the chain
           CONTAINER_NAME: okctl-kotlin-app-template-dev
           IMAGE_TAG: ${{ github.sha }}
-          DEPLOYMENT_YAML_FILE: infrastructure/applications/okctl-kotlin-app-template-dev/overlays/okctl-template-prod/deployment-patch.json
+          DEPLOYMENT_YAML_FILE: infrastructure/applications/kotlin-test-app/overlays/okctl-template-prod/deployment-patch.json
         run: |
           # Update image tag
           sudo snap install jq
