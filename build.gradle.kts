@@ -46,7 +46,6 @@ dependencies {
     // KTor
     val ktor_version = "1.5.2"
     implementation("io.ktor:ktor-server-netty:$ktor_version")
-//    implementation("io.ktor:ktor-server-tomcat:$ktor_version")
     implementation("io.ktor:ktor-locations:$ktor_version")
     implementation("io.ktor:ktor-gson:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
@@ -54,6 +53,16 @@ dependencies {
     implementation("io.ktor:ktor-serialization:$ktor_version")
     implementation("io.ktor:ktor-jackson:$ktor_version")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
+
+    // Database
+    implementation("org.postgresql:postgresql:42.2.20")
+    implementation("org.flywaydb:flyway-core:7.8.2")
+    implementation("com.mchange:c3p0:0.9.5.5")
+
+    // Database ORM: Ktorm
+    val ktorm_version = "3.3.0"
+    implementation("org.ktorm:ktorm-core:$ktorm_version")
+    implementation( "org.ktorm:ktorm-support-postgresql:${ktorm_version}")
 
     // Note: 2.10.2 is the relevant jackson-version as of ktor-jackson 1.5.2. Keep an eye on this when upgrading ktor.
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.2")

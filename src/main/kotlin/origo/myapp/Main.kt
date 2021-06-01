@@ -2,6 +2,7 @@ package origo.myapp
 
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.mchange.v2.c3p0.ComboPooledDataSource
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
@@ -9,7 +10,13 @@ import io.ktor.jackson.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import mu.KotlinLogging
+import org.flywaydb.core.Flyway
+import org.flywaydb.core.api.Location
+import org.flywaydb.core.api.configuration.ClassicConfiguration
 import java.io.File
+import javax.sql.DataSource
+import org.ktorm.database.Database
+import org.ktorm.support.postgresql.PostgreSqlDialect
 
 private val logger = KotlinLogging.logger {}
 
@@ -32,7 +39,7 @@ fun Application.main() {
         }
 
         get("/") {
-            call.respond(mapOf("hello3" to "world2"))
+            call.respond(mapOf("hello" to "world"))
         }
 
         get("/test") {
@@ -40,5 +47,51 @@ fun Application.main() {
         }
     }
 
+    setupDatabase()
     logger.info("Application started")
+}
+
+
+private fun Application.setupDatabase() {
+    // Database
+    val dbEndpoint = getEnv("DB_ENDPOINT")
+    val dbUsername = getEnv("DB_USERNAME")
+    val dbPassword = getEnv("DB_PASSWORD")
+    val dbName = getEnv("DB_NAME")
+    val connectString = "jdbc:postgresql://$dbEndpoint/$dbName"
+
+    val datasource = ComboPooledDataSource()
+    datasource.driverClass = "org.postgresql.ds.PGSimpleDataSource" //Real driver set in connect string.
+    datasource.jdbcUrl = connectString
+    datasource.user = dbUsername
+    datasource.password = dbPassword
+
+    log.info("Using database: $dbName. Running flyway migrations...")
+
+    val flywayConfig = ClassicConfiguration()
+    flywayConfig.setLocations(Location("classpath:/sql/migrations/"))
+    flywayConfig.dataSource = datasource
+    flywayConfig.isIgnoreMissingMigrations = true
+    flywayConfig.setBaselineVersionAsString("1")
+    val flyway = Flyway(flywayConfig)
+
+    flyway.migrate()
+
+    log.info("Flyway migrations done. Connecting Ktorm framework to database.")
+
+    connectToDatabase(datasource)
+
+    log.info("Database set up and Ktorm framework has connected.")
+}
+
+private fun getEnv(env: String): String {
+    return System.getenv(env) ?: throw RuntimeException("Could not find environment variable: $env")
+}
+
+private fun connectToDatabase(datasource: DataSource): Database {
+    val db = Database.connect(
+        datasource,
+        dialect = PostgreSqlDialect()
+    )
+    return db
 }
