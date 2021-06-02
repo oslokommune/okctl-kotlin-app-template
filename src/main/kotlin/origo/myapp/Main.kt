@@ -66,7 +66,7 @@ private fun Application.setupDatabase() {
     datasource.user = dbUsername
     datasource.password = dbPassword
 
-    log.info("Using database: $dbName. Running flyway migrations...")
+    log.info("Using database: $dbName. Endpoint: $dbEndpoint.")
 
     val flywayConfig = ClassicConfiguration()
     flywayConfig.setLocations(Location("classpath:/sql/migrations/"))
@@ -75,13 +75,13 @@ private fun Application.setupDatabase() {
     flywayConfig.setBaselineVersionAsString("1")
     val flyway = Flyway(flywayConfig)
 
+    log.info("Running flyway migrations...")
     flyway.migrate()
+    log.info("Flyway migrations done.")
 
-    log.info("Flyway migrations done. Connecting Ktorm framework to database.")
-
+    log.info("Connecting Ktorm framework to database.")
     connectToDatabase(datasource)
-
-    log.info("Database set up and Ktorm framework has connected.")
+    log.info("Connected to database.")
 }
 
 private fun getEnv(env: String): String {
