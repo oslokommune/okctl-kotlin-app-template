@@ -72,7 +72,7 @@ jobs:
           DEPLOYMENT_YAML_FILE: infrastructure/applications/kotlin-test-app/overlays/okctl-template-dev/deployment-patch.json
         run: |
           # Update image tag
-          sudo snap install jq
+          sudo apt install jq
           image=$(jq -r '.[] | select(.path=="/spec/template/spec/containers/0/image").value' ${DEPLOYMENT_YAML_FILE})
 
           if [[ "$image" == *":"* ]]; then
