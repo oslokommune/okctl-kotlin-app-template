@@ -54,7 +54,12 @@ fun Application.main() {
 
 private fun Application.setupDatabase() {
     // Database
-    val dbEndpoint = getEnv("DB_ENDPOINT")
+    // TODO this is a HACK, fix it properly, we have 10 min to allmøte.
+    val dbEndpoint = try {
+        getEnv("DB_ENDPOINT")
+    } catch (e: Exception) {
+        return
+    }
     val dbUsername = getEnv("DB_USERNAME")
     val dbPassword = getEnv("DB_PASSWORD")
     val dbName = getEnv("DB_NAME")
