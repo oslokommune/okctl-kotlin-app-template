@@ -66,6 +66,12 @@ dependencies {
 
     // Note: 2.10.2 is the relevant jackson-version as of ktor-jackson 1.5.2. Keep an eye on this when upgrading ktor.
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.2")
+
+    // Metrics
+    implementation ("io.ktor:ktor-metrics:$ktor_version")
+    implementation ("io.ktor:ktor-metrics-micrometer:$ktor_version")
+    implementation ("io.micrometer:micrometer-registry-prometheus:1.3.1")
+
 }
 
 tasks.test {

@@ -7,8 +7,11 @@ import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.jackson.*
+import io.ktor.metrics.micrometer.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.micrometer.prometheus.PrometheusConfig
+import io.micrometer.prometheus.PrometheusMeterRegistry
 import mu.KotlinLogging
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.Location
@@ -31,6 +34,11 @@ fun Application.main() {
         }
     }
 
+    val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+    install(MicrometerMetrics) {
+        registry = appMicrometerRegistry
+    }
+
     val html = File("index.html").readText()
 
     routing {
@@ -44,6 +52,11 @@ fun Application.main() {
 
         get("/test") {
             call.respondText(html, ContentType.Text.Html)
+        }
+        routing {
+            get("/metrics") {
+                call.respond(appMicrometerRegistry.scrape())
+            }
         }
     }
 
