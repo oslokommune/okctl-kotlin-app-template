@@ -52,6 +52,7 @@ fun Application.main() {
 
         get("/test") {
             call.respondText(html, ContentType.Text.Html)
+            logger.info("Test page called.")
         }
         routing {
             get("/metrics") {
