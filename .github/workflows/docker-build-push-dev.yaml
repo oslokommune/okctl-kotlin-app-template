@@ -42,11 +42,6 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          env:
-            DB_ENDPOINT: ${{ secrets.DB_ENDPOINT }}
-            DB_USERNAME: ${{ secrets.DB_USERNAME }}
-            DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-            DB_NAME: ${{ secrets.DB_NAME }}
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         working-directory: .
 
