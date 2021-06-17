@@ -95,7 +95,9 @@ private fun Application.setupDatabase() {
     val flyway = Flyway(flywayConfig)
 
     log.info("Running flyway migrations...")
+    log.info("wait for it")
     flyway.migrate()
+    log.info("aaan it's crashed")
     log.info("Flyway migrations done.")
 
     log.info("Connecting Ktorm framework to database.")
