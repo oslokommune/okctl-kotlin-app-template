@@ -92,6 +92,7 @@ private fun Application.setupDatabase() {
     flywayConfig.dataSource = datasource
     flywayConfig.isIgnoreMissingMigrations = true
     flywayConfig.setBaselineVersionAsString("1")
+    flywayConfig.isBaselineOnMigrate = true
     val flyway = Flyway(flywayConfig)
 
     log.info("Running flyway migrations...")
