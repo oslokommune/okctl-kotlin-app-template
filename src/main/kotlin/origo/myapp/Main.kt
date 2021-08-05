@@ -19,6 +19,11 @@ import org.flywaydb.core.api.configuration.ClassicConfiguration
 import java.io.File
 import javax.sql.DataSource
 import org.ktorm.database.Database
+import org.ktorm.dsl.from
+import org.ktorm.dsl.select
+import org.ktorm.entity.Entity
+import org.ktorm.schema.Table
+import org.ktorm.schema.varchar
 import org.ktorm.support.postgresql.PostgreSqlDialect
 
 private val logger = KotlinLogging.logger {}
@@ -39,8 +44,16 @@ fun Application.main() {
         registry = appMicrometerRegistry
     }
 
-    val html = File("index.html").readText()
 
+    setupRouting(appMicrometerRegistry)
+    setupDatabase()
+    logger.info("Application started")
+}
+
+private fun Application.setupRouting(
+    appMicrometerRegistry: PrometheusMeterRegistry
+) {
+    val html = File("index.html").readText()
     routing {
         get("/health") {
             call.respond(mapOf("OK" to "true"))
@@ -59,33 +72,36 @@ fun Application.main() {
                 call.respond(appMicrometerRegistry.scrape())
             }
         }
-    }
 
-    setupDatabase()
-    logger.info("Application started")
+        // TODO OK cool, we have users in the database, next step is to figure out how to fetch them and do the thing
+
+        routing {
+            get("/users") {
+                val usernames = getUsernames()
+                call.respondText(usernames.toString())
+            }
+        }
+    }
+}
+
+
+interface User : Entity<User> {
+    companion object : Entity.Factory<User>()
+    val id: String
+    var name: String
+}
+
+/**
+ * The employee table object.
+ */
+object Users : Table<User>("users") {
+    val id = varchar("id").primaryKey().bindTo { it.id }
+    val name = varchar("name").bindTo { it.name }
 }
 
 
 private fun Application.setupDatabase() {
-    // Database
-    // TODO this is a HACK, fix it properly, we have 10 min to allmøte.
-    val dbEndpoint = try {
-        getEnv("DB_ENDPOINT")
-    } catch (e: Exception) {
-        return
-    }
-    val dbUsername = getEnv("DB_USERNAME")
-    val dbPassword = getEnv("DB_PASSWORD")
-    val dbName = getEnv("DB_NAME")
-    val connectString = "jdbc:postgresql://$dbEndpoint/$dbName"
-
-    val datasource = ComboPooledDataSource()
-    datasource.driverClass = "org.postgresql.ds.PGSimpleDataSource" //Real driver set in connect string.
-    datasource.jdbcUrl = connectString
-    datasource.user = dbUsername
-    datasource.password = dbPassword
-
-    log.info("Using database: $dbName. Endpoint: $dbEndpoint.")
+    val datasource = getDatasource()
 
     val flywayConfig = ClassicConfiguration()
     flywayConfig.setLocations(Location("classpath:/sql/migrations/"))
@@ -100,10 +116,52 @@ private fun Application.setupDatabase() {
     flyway.migrate()
     log.info("aaan it's crashed")
     log.info("Flyway migrations done.")
+}
 
-    log.info("Connecting Ktorm framework to database.")
-    connectToDatabase(datasource)
-    log.info("Connected to database.")
+private fun Application.getUsernames(): ArrayList<String> {
+    val usernames = arrayListOf<String>()
+
+    val datasource = getDatasource()
+    val database = connectToDatabase(datasource)
+
+
+    for (row in database.from(Users).select()) {
+        val id: String? = row[Users.id]
+        val name: String? = row[Users.name]
+
+        if (!name.isNullOrEmpty()) {
+            usernames.add(name)
+        }
+    }
+    datasource.close()
+    return usernames
+}
+
+private fun Application.getDatasource(): ComboPooledDataSource {
+    // Database
+    val datasource = ComboPooledDataSource()
+    val dbEndpoint = getEnv("DB_ENDPOINT")
+
+    if (dbEndpoint.length == 0) {
+        log.info("DB endpoint not found!")
+    } else {
+        log.info("found endpoint " + dbEndpoint)
+
+        val dbUsername = getEnv("DB_USERNAME")
+        val dbPassword = getEnv("DB_PASSWORD")
+        val dbName = getEnv("DB_NAME")
+        val connectString = "jdbc:postgresql://$dbEndpoint/$dbName"
+
+
+        datasource.driverClass = "org.postgresql.ds.PGSimpleDataSource" //Real driver set in connect string.
+        datasource.jdbcUrl = connectString
+        datasource.user = dbUsername
+        datasource.password = dbPassword
+
+        log.info("Using database: $dbName. Endpoint: $dbEndpoint.")
+    }
+    return datasource
+
 }
 
 private fun getEnv(env: String): String {
