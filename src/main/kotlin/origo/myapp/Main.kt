@@ -25,6 +25,8 @@ import org.ktorm.entity.Entity
 import org.ktorm.schema.Table
 import org.ktorm.schema.varchar
 import org.ktorm.support.postgresql.PostgreSqlDialect
+import javax.management.RuntimeErrorException
+import kotlin.random.Random
 
 private val logger = KotlinLogging.logger {}
 
@@ -61,6 +63,15 @@ private fun Application.setupRouting(
 
         get("/") {
             call.respond(mapOf("hello" to "world"))
+        }
+
+        get("/risky") {
+            val crash = Random.nextBoolean()
+            if (crash) {
+                throw RuntimeException("Randomly crashed!")
+            } else {
+                call.respond(mapOf("You got" to "lucky"))
+            }
         }
 
         get("/test") {
