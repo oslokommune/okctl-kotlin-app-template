@@ -6,6 +6,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.jackson.*
 import io.ktor.metrics.micrometer.*
 import io.ktor.response.*
@@ -26,12 +27,14 @@ import org.ktorm.schema.Table
 import org.ktorm.schema.varchar
 import org.ktorm.support.postgresql.PostgreSqlDialect
 import javax.management.RuntimeErrorException
+import kotlin.jvm.internal.Intrinsics
 import kotlin.random.Random
 
 private val logger = KotlinLogging.logger {}
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
+// TODO so, should we continue down this path, or should we uh, hmm
 fun Application.main() {
     install(ContentNegotiation) {
         jackson {
@@ -62,7 +65,7 @@ private fun Application.setupRouting(
         }
 
         get("/") {
-            call.respond(mapOf("hello" to "world"))
+            call.respondText(html, ContentType.Text.Html)
         }
 
         get("/risky") {
@@ -83,18 +86,17 @@ private fun Application.setupRouting(
                 call.respond(appMicrometerRegistry.scrape())
             }
         }
-
-        // TODO OK cool, we have users in the database, next step is to figure out how to fetch them and do the thing
-
         routing {
             get("/users") {
                 val usernames = getUsernames()
                 call.respondText(usernames.toString())
             }
         }
+        routing {
+            file("gopher.png")
+        }
     }
 }
-
 
 interface User : Entity<User> {
     companion object : Entity.Factory<User>()
@@ -113,20 +115,21 @@ object Users : Table<User>("users") {
 
 private fun Application.setupDatabase() {
     val datasource = getDatasource()
+    if (datasource.jdbcUrl != null) {
+        val flywayConfig = ClassicConfiguration()
+        flywayConfig.setLocations(Location("classpath:/sql/migrations/"))
+        flywayConfig.dataSource = datasource
+        flywayConfig.isIgnoreMissingMigrations = true
+        flywayConfig.setBaselineVersionAsString("1")
+        flywayConfig.isBaselineOnMigrate = true
+        val flyway = Flyway(flywayConfig)
 
-    val flywayConfig = ClassicConfiguration()
-    flywayConfig.setLocations(Location("classpath:/sql/migrations/"))
-    flywayConfig.dataSource = datasource
-    flywayConfig.isIgnoreMissingMigrations = true
-    flywayConfig.setBaselineVersionAsString("1")
-    flywayConfig.isBaselineOnMigrate = true
-    val flyway = Flyway(flywayConfig)
-
-    log.info("Running flyway migrations...")
-    log.info("wait for it")
-    flyway.migrate()
-    log.info("aaan it's crashed")
-    log.info("Flyway migrations done.")
+        log.info("Running flyway migrations...")
+        log.info("wait for it")
+        flyway.migrate()
+        log.info("aaan it's crashed")
+        log.info("Flyway migrations done.")
+    }
 }
 
 private fun Application.getUsernames(): ArrayList<String> {
@@ -151,11 +154,18 @@ private fun Application.getUsernames(): ArrayList<String> {
 private fun Application.getDatasource(): ComboPooledDataSource {
     // Database
     val datasource = ComboPooledDataSource()
-    val dbEndpoint = getEnv("DB_ENDPOINT")
 
-    if (dbEndpoint.length == 0) {
-        log.info("DB endpoint not found!")
-    } else {
+    var found = true
+    val dbEndpoint = try {
+        getEnv("DB_ENDPOINT")
+    } catch (e: Exception) {
+
+        log.info("DB endpoint not found.")
+        log.info("Setting found to false!")
+        found = false
+    }
+
+    if (found) {
         log.info("found endpoint " + dbEndpoint)
 
         val dbUsername = getEnv("DB_USERNAME")

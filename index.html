@@ -1,18 +1,30 @@
 <html>
 <head>
-    <style>h1 {color: red}</style>
-
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <style>
+        .container {
+            margin: 0 auto;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h1>Proper html! OK</h1>
-    <p> test change</p>
-    <p> test change2</p>
-    <p> test change3</p>
-    <p> test change4</p>
-    <p> test change5</p>
-    <p> test change6</p>
-    <p> test change7</p>
-    <p> Logs when hitting page</p>
-    <p> Test change8</p>
+    <div id="app">
+        <div class="container">
+
+            <h1>Okctl super simple reference application</h1>
+
+            <p><strong>Test your logs, what happens if you click?</strong>
+            Will it <a href="/risky"><button>Crash?</button></a></p>
+
+            <p><strong>Check your database, does it have content?</strong>
+            List some <a href="/users"><button>Users</button></a></p>
+
+            <img src="gopher.png" style="width:500px">
+        </div>
+    </div>
 </body>
 </html>
