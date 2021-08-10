@@ -27,6 +27,6 @@ USER $APP_USER
 
 COPY --from=builder /home/gradle/build/libs/gradle-0.0.1-SNAPSHOT-all.jar /app.jar
 COPY index.html .
-COPY static .
+COPY gopher.png .
 
 CMD [ "java", "-jar", "-Djava.security.egd=file:/dev/./urandom", "/app.jar" ]
