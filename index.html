@@ -1,30 +1,78 @@
 <html>
 <head>
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+
     <style>
         .container {
             margin: 0 auto;
             text-align: center;
         }
+
+        .actions {
+            text-align: left;
+            position: relative;
+            left: 25%;
+            width: 50%;
+        }
+
+        .action {
+            float: right;
+            width: 100px;
+        }
+        a {
+            color: black
+        }
     </style>
 </head>
 <body>
-    <div id="app">
-        <div class="container">
+<div id="app">
+    <div class="container">
+        <h1>Okctl super simple reference application</h1>
+        <div class="actions">
+            <p><strong>50 % chance of</strong>
+                <a href="/risky">
+                    <button class="action">Crash?</button>
+                </a></p>
 
-            <h1>Okctl super simple reference application</h1>
+            <p><strong>Check your database for content</strong>
+                <a href="/users">
+                    <button class="action">List users</button>
+                </a></p>
 
-            <p><strong>Test your logs, what happens if you click?</strong>
-            Will it <a href="/risky"><button>Crash?</button></a></p>
+            <p><strong>Test your info log</strong> <input id="logcontent"/>
+                <button class="action"
+                        onclick="logthis()">Write it!
+                </button>
+            </p>
 
-            <p><strong>Check your database, does it have content?</strong>
-            List some <a href="/users"><button>Users</button></a></p>
-
-            <img src="gopher.png" style="width:500px">
         </div>
+        <br />
+        <img src="gopher.png" style="width:500px">
     </div>
+</div>
 </body>
+
+<script>
+    function logthis() {
+        var logline = document.getElementById("logcontent").value
+        console.log(logline)
+        $.ajax({
+            url: "/logthis?logline=" + logline,
+            context: document.body
+        }).done(function () {
+            $(this).addClass("done");
+        });
+
+    }
+
+</script>
 </html>

@@ -26,8 +26,6 @@ import org.ktorm.entity.Entity
 import org.ktorm.schema.Table
 import org.ktorm.schema.varchar
 import org.ktorm.support.postgresql.PostgreSqlDialect
-import javax.management.RuntimeErrorException
-import kotlin.jvm.internal.Intrinsics
 import kotlin.random.Random
 
 private val logger = KotlinLogging.logger {}
@@ -75,6 +73,10 @@ private fun Application.setupRouting(
             } else {
                 call.respond(mapOf("You got" to "lucky"))
             }
+        }
+
+        get("/logthis") {
+            log.info(call.request.queryParameters["logline"])
         }
 
         get("/test") {
