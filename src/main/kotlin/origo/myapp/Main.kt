@@ -103,11 +103,31 @@ private fun Application.setupRouting(
                 call.respondText(usernames.toString())
             }
         }
+
+        routing {
+            get("/writetofile") {
+                writeToPvc()
+                call.respondText("Attemted writing to PVC")
+            }
+
+        }
         routing {
             file("gopher.png")
             file("OsloSans-Regular.woff")
         }
     }
+}
+
+private fun writeToPvc() {
+    val fileName = "template/local/storage/myfile.txt"
+    val myfile = File(fileName)
+
+    myfile.printWriter().use { out ->
+
+        out.println("First line")
+        out.println("Second line")
+    }
+
 }
 
 interface User : Entity<User> {
