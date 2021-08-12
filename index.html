@@ -1,5 +1,7 @@
 <html>
 <head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -7,14 +9,20 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
             crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-
 
     <style>
+
+        @font-face {
+            font-family: 'oslosans';
+            src: url("/OsloSans-Regular.woff") format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         .container {
             margin: 0 auto;
             text-align: center;
+            font-family: oslosans;
         }
 
         .actions {
@@ -22,15 +30,37 @@
             position: relative;
             left: 25%;
             width: 50%;
+            margin-top: 25px;
         }
 
-        .action {
+        .actions p {
+            margin: 0px 0px 25px 10px;
+        }
+
+        button {
             float: right;
             width: 100px;
         }
-        a {
-            color: black
+
+        input {
+            float: right;
+            margin-right: 20px;
+            line-height: 30px;
         }
+        iframe {
+            display: none;
+        }
+        iframe.active {
+            animation: fadein 1s;
+            display: inline-block;
+            border-style: none;
+            width: 50%;
+            margin: 25px 0;
+            background-color: #f9c66b;
+            border-radius: 25px;
+            padding: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -39,40 +69,67 @@
         <h1>Okctl super simple reference application</h1>
         <div class="actions">
             <p><strong>50 % chance of</strong>
-                <a href="/risky">
-                    <button class="action">Crash?</button>
-                </a></p>
+                <button tabindex="1" class="btn btn-primary" onclick="crashMeMaybe()">Crash?</button>
+            </p>
 
-            <p><strong>Check your database for content</strong>
-                <a href="/users">
-                    <button class="action">List users</button>
-                </a></p>
+            <p><strong>Check your database</strong>
+                <button tabindex="2" class="btn btn-primary" onclick="listusers()">List users</button>
+            </p>
 
-            <p><strong>Test your info log</strong> <input id="logcontent"/>
-                <button class="action"
+            <p><strong>Test your info log</strong>
+                <button tabindex=4" class="btn btn-primary"
                         onclick="logthis()">Write it!
                 </button>
+                <input tabindex="3" id="logcontent"/>
+            </p>
+
+            <p><strong>Add a user</strong>
+                <button tabindex="6" class="btn btn-primary"
+                        onclick="addUser()">Add it!
+                </button>
+                <input tabindex="5" id="newuser"/>
             </p>
 
         </div>
-        <br />
+        <br/>
+        <iframe id="result"></iframe>
+        <br/>
         <img src="gopher.png" style="width:500px">
     </div>
 </div>
 </body>
 
 <script>
-    function logthis() {
-        var logline = document.getElementById("logcontent").value
-        console.log(logline)
-        $.ajax({
-            url: "/logthis?logline=" + logline,
-            context: document.body
-        }).done(function () {
-            $(this).addClass("done");
-        });
-
+    function activeFrame() {
+        var frame = document.getElementById("result")
+        frame.classList = "active"
     }
+    function logthis() {
+        activeFrame()
+        var logline = document.getElementById("logcontent").value
+        var frame = document.getElementById("result")
+        frame.src = "/logthis?logline=" + logline
+    }
+
+    function addUser() {
+        activeFrame()
+        var username = document.getElementById("newuser").value
+        var frame = document.getElementById("result")
+        frame.src = "/adduser?username=" + username
+    }
+
+    function listusers() {
+        activeFrame()
+        var frame = document.getElementById("result")
+        frame.src = "/users"
+    }
+
+    function crashMeMaybe() {
+        activeFrame()
+        var frame = document.getElementById("result")
+        frame.src = "/risky"
+    }
+
 
 </script>
 </html>

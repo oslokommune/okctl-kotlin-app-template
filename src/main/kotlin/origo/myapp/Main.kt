@@ -21,11 +21,14 @@ import java.io.File
 import javax.sql.DataSource
 import org.ktorm.database.Database
 import org.ktorm.dsl.from
+import org.ktorm.dsl.insert
 import org.ktorm.dsl.select
 import org.ktorm.entity.Entity
 import org.ktorm.schema.Table
 import org.ktorm.schema.varchar
 import org.ktorm.support.postgresql.PostgreSqlDialect
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 private val logger = KotlinLogging.logger {}
@@ -69,6 +72,7 @@ private fun Application.setupRouting(
         get("/risky") {
             val crash = Random.nextBoolean()
             if (crash) {
+                call.respond("It's a crash! Check your log!")
                 throw RuntimeException("Randomly crashed!")
             } else {
                 call.respond(mapOf("You got" to "lucky"))
@@ -76,13 +80,18 @@ private fun Application.setupRouting(
         }
 
         get("/logthis") {
-            log.info(call.request.queryParameters["logline"])
+            val logline = call.request.queryParameters["logline"]
+            log.info(logline)
+            call.respond(mapOf("Check your log for" to logline))
         }
 
-        get("/test") {
-            call.respondText(html, ContentType.Text.Html)
-            logger.info("Test page called.")
+        // Yes this should be a post, this is not a Ktor refrence app :)
+        get("/adduser") {
+            val username = call.request.queryParameters["username"]
+            addUser(username.toString())
+            call.respond(mapOf("User added" to username))
         }
+
         routing {
             get("/metrics") {
                 call.respond(appMicrometerRegistry.scrape())
@@ -96,6 +105,7 @@ private fun Application.setupRouting(
         }
         routing {
             file("gopher.png")
+            file("OsloSans-Regular.woff")
         }
     }
 }
@@ -103,7 +113,7 @@ private fun Application.setupRouting(
 interface User : Entity<User> {
     companion object : Entity.Factory<User>()
     val id: String
-    var name: String
+    val name: String
 }
 
 /**
@@ -152,6 +162,19 @@ private fun Application.getUsernames(): ArrayList<String> {
     datasource.close()
     return usernames
 }
+
+private fun Application.addUser(username: String) {
+    val datasource = getDatasource()
+    val database = connectToDatabase(datasource)
+
+    database.insert(Users) {
+        set(it.id, UUID.randomUUID().toString())
+        set(it.name, username)
+    }
+
+    datasource.close()
+}
+
 
 private fun Application.getDatasource(): ComboPooledDataSource {
     // Database
