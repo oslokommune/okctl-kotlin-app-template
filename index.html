@@ -33,6 +33,15 @@
         button {
             float: right;
             width: 100px;
+            background-color: #2A2859;
+            color: #fff;
+        }
+        button:focus {
+            color: #fff !important;
+        }
+        button:hover{
+            background-color: #6FE9FF;
+            color: black !important;
         }
 
         input {
@@ -62,22 +71,22 @@
         <h1>Okctl super simple reference application</h1>
         <div class="actions">
             <p><strong>50 % chance of</strong>
-                <button tabindex="1" class="btn btn-primary" onclick="crashMeMaybe()">Crash?</button>
+                <button tabindex="1" class="btn " onclick="crashMeMaybe()">Crash?</button>
             </p>
 
-            <p><strong>Check your database</strong>
-                <button tabindex="2" class="btn btn-primary" onclick="listusers()">List users</button>
+            <p><strong>List users in database</strong>
+                <button tabindex="2" class="btn " onclick="listusers()">List them!</button>
             </p>
 
-            <p><strong>Test your info log</strong>
-                <button tabindex=4" class="btn btn-primary"
+            <p><strong>Write a line log</strong>
+                <button tabindex=4" class="btn "
                         onclick="logthis()">Write it!
                 </button>
                 <input tabindex="3" id="logcontent"/>
             </p>
 
             <p><strong>Add a user</strong>
-                <button tabindex="6" class="btn btn-primary"
+                <button tabindex="6" class="btn "
                         onclick="addUser()">Add it!
                 </button>
                 <input tabindex="5" id="newuser"/>
