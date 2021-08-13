@@ -118,16 +118,18 @@ private fun Application.setupRouting(
     }
 }
 
-private fun writeToPvc() {
+private fun Application.writeToPvc() {
     val fileName = "/template/local/storage/myfile.txt"
     val myfile = File(fileName)
 
-    myfile.printWriter().use { out ->
-
-        out.println("First line")
-        out.println("Second line")
+    try {
+        myfile.printWriter().use { out ->
+            out.println("First line")
+            out.println("Second line")
+        }
+    } catch (e: Exception) {
+        log.error(e.message)
     }
-
 }
 
 interface User : Entity<User> {
