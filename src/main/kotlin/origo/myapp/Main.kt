@@ -89,7 +89,7 @@ private fun Application.setupRouting(
         get("/adduser") {
             val username = call.request.queryParameters["username"]
             addUser(username.toString())
-            call.respond(mapOf("User added" to username))
+
         }
 
         routing {
@@ -105,12 +105,20 @@ private fun Application.setupRouting(
         }
 
         routing {
-            get("/writetofile") {
-                writeToPvc()
-                call.respondText("Attemted writing to PVC")
+            get("/writetopvc") {
+                val fileline = call.request.queryParameters["fileline"]
+                writeToPvc(fileline.toString())
+                call.respond(mapOf("Wrote to pvc" to fileline))
             }
-
         }
+
+        routing {
+            get("/readfrompvc") {
+                val filecontent = readFromPvc()
+                call.respondText(filecontent)
+            }
+        }
+
         routing {
             file("gopher.png")
             file("OsloSans-Regular.woff")
@@ -118,18 +126,33 @@ private fun Application.setupRouting(
     }
 }
 
-private fun Application.writeToPvc() {
+private fun Application.writeToPvc(value: String) {
     val fileName = "/template/local/storage/myfile.txt"
     val myfile = File(fileName)
 
     try {
         myfile.printWriter().use { out ->
-            out.println("First line")
-            out.println("Second line")
+            out.println(value)
         }
     } catch (e: Exception) {
         log.error(e.message)
     }
+}
+
+private fun Application.readFromPvc(): String {
+    val fileName = "/template/local/storage/myfile.txt"
+    val myfile = File(fileName)
+    var result = ""
+    try {
+        val readLines = myfile.readLines()
+        for (line in readLines) {
+            result += line
+        }
+
+    } catch (e: Exception) {
+        log.error(e.message)
+    }
+    return result
 }
 
 interface User : Entity<User> {

@@ -92,6 +92,17 @@
                 <input tabindex="5" id="newuser"/>
             </p>
 
+            <p><strong>Write to PVC</strong>
+                <button tabindex="7" class="btn "
+                        onclick="writeToPvc()">Write it!
+                </button>
+                <input tabindex="8" id="fileline"/>
+            </p>
+
+            <p><strong>Read from PVC</strong>
+                <button tabindex="9" class="btn " onclick="readFromPvc()">Read it!</button>
+            </p>
+
         </div>
         <br/>
         <iframe id="result"></iframe>
@@ -132,6 +143,18 @@
         frame.src = "/risky"
     }
 
+    function writeToPvc() {
+        activeFrame()
+        var fileline = document.getElementById("fileline").value
+        var frame = document.getElementById("result")
+        frame.src = "/writetopvc?fileline=" + fileline
+    }
+
+    function readFromPvc() {
+        activeFrame()
+        var frame = document.getElementById("result")
+        frame.src = "/readfrompvc"
+    }
 
 </script>
 </html>
