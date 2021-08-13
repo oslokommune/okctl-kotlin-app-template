@@ -127,13 +127,13 @@ private fun Application.setupRouting(
 }
 
 private fun Application.writeToPvc(value: String) {
-    val fileName = "/template/local/storage/myfile.txt"
-    val myfile = File(fileName)
-
     try {
-        myfile.printWriter().use { out ->
-            out.println(value)
-        }
+        val fileName = "/template/local/storage/myfile.txt"
+        val file = File(fileName)
+        file.appendText(value)
+        file.appendText("\n\r")
+
+
     } catch (e: Exception) {
         log.error(e.message)
     }
@@ -146,7 +146,7 @@ private fun Application.readFromPvc(): String {
     try {
         val readLines = myfile.readLines()
         for (line in readLines) {
-            result += line
+            result += line + "\n\r"
         }
 
     } catch (e: Exception) {
