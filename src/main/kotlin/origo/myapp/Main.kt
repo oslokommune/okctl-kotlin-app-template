@@ -119,7 +119,7 @@ private fun Application.setupRouting(
 }
 
 private fun writeToPvc() {
-    val fileName = "template/local/storage/myfile.txt"
+    val fileName = "/template/local/storage/myfile.txt"
     val myfile = File(fileName)
 
     myfile.printWriter().use { out ->
