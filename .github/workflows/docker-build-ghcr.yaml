@@ -49,4 +49,4 @@ jobs:
         run: docker build --tag ${{ env.tag }}:latest .
 
       - name: Push docker image
-        run: docker push ${{ env.tag }}:latest
+        run: sudo docker push ${{ env.tag }}:latest
