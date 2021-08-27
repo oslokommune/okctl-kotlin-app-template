@@ -1,16 +1,10 @@
 name: Docker build and push to ghcr
 
-
 on:
   workflow_dispatch:
   push:
-    branches:
-      - ghcr
-#on:
-#  workflow_dispatch:
-#  push:
-#    tags:
-#      - '*'
+    tags:
+      - '*'
 
 jobs:
   docker-build-push:
@@ -46,7 +40,7 @@ jobs:
         id: version_store
 
       - name: Build and push Docker images
-        run: docker build --tag ${{ env.tag }}:latest .
+        run: docker build --tag ${{ env.tag }}:{{ env.version }}
 
       - name: Push docker image
-        run: docker push ${{ env.tag }}:latest
+        run: docker push ${{ env.version }}:latest
