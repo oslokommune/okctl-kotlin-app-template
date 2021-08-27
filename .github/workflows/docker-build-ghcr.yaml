@@ -28,8 +28,8 @@ jobs:
         with:
           ## TODO You need your own ghcr user
           registry: ghcr.io
-          username: okctl@oslo.kommune.no
-          password: ${{ secrets.OKCTL_TEMPLATE_DEPLOY_KEY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Github Tag Bump
         id: bump_version
