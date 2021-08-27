@@ -31,6 +31,15 @@ jobs:
           username: okctl@oslo.kommune.no
           password: ${{ secrets.OKCTL_TEMPLATE_DEPLOY_KEY }}
 
+      - name: Github Tag Bump
+        id: bump_version
+        uses: anothrNick/github-tag-action@18284c78f6ac68868d5341f57c4f971fb5b7605c # 1.34.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
+          RELEASE_BRANCHES: main
+          WITH_V: true
+
       - run: echo "tag=ghcr.io/oslokommune/okctl-kotlin-app-template" >> $GITHUB_ENV
         id: tag_store
       - run: echo "version=$(git describe --tags `git rev-list --tags --max-count=1`)" >> $GITHUB_ENV
