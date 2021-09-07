@@ -40,7 +40,7 @@ jobs:
         id: version_store
 
       - name: Build and push Docker images
-        run: docker build --tag ${{ env.tag }}:${{ env.version }}
+        run: docker build -t ${{ env.tag }}:${{ env.version }} .
 
       - name: Push docker image
         run: docker push ${{ env.version }}:${{ env.version }}
