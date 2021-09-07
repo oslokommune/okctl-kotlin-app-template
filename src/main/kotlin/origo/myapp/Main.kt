@@ -107,8 +107,8 @@ private fun Application.setupRouting(
         routing {
             get("/writetopvc") {
                 val fileline = call.request.queryParameters["fileline"]
-                writeToPvc(fileline.toString())
-                call.respond(mapOf("Wrote to pvc" to fileline))
+                val result = writeToPvc(fileline.toString())
+                call.respond(result)
             }
         }
 
@@ -126,16 +126,17 @@ private fun Application.setupRouting(
     }
 }
 
-private fun Application.writeToPvc(value: String) {
+private fun Application.writeToPvc(value: String): String {
     try {
         val fileName = "/template/local/storage/myfile.txt"
         val file = File(fileName)
         file.appendText(value)
         file.appendText("\n\r")
+        return "Wrote $value to PVC."
 
 
     } catch (e: Exception) {
-        log.error(e.message)
+        return e.message.toString()
     }
 }
 
