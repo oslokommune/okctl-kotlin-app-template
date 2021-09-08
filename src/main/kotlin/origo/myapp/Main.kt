@@ -35,7 +35,6 @@ private val logger = KotlinLogging.logger {}
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-// TODO so, should we continue down this path, or should we uh, hmm
 fun Application.main() {
     install(ContentNegotiation) {
         jackson {
@@ -188,9 +187,7 @@ private fun Application.setupDatabase() {
         val flyway = Flyway(flywayConfig)
 
         log.info("Running flyway migrations...")
-        log.info("wait for it")
         flyway.migrate()
-        log.info("aaan it's crashed")
         log.info("Flyway migrations done.")
     }
 }
