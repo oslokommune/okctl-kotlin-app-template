@@ -1,4 +1,4 @@
-<html>
+<html lang="EN">
 <head>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
@@ -27,32 +27,43 @@
         }
 
         .actions p {
-            margin: 0px 0px 25px 10px;
+            height: 25px;
+            margin-bottom: 20px;
+        }
+
+
+        button.fullwidth {
+            width: 100%;
         }
 
         button {
-            float: right;
-            width: 100px;
+            width: 45%;
             background-color: #2A2859;
             color: #fff;
+            float: right
+
         }
+
         button:focus {
             color: #fff !important;
         }
-        button:hover{
+
+        button:hover {
             background-color: #6FE9FF;
             color: black !important;
         }
 
         input {
-            float: right;
-            margin-right: 20px;
             line-height: 27px;
             margin-top: 1px;
+            width: 50%;
+
         }
+
         iframe {
             display: none;
         }
+
         iframe.active {
             animation: fadein 1s;
             display: inline-block;
@@ -62,47 +73,49 @@
             background-color: #f9c66b;
             border-radius: 25px;
             padding: 10px;
-            height:200px;
+            height: 200px;
         }
 
     </style>
+    <title>Demo okctl app</title>
 </head>
 <body>
 <div id="app">
     <div class="container">
         <h1>Okctl super simple reference application</h1>
         <div class="actions">
-            <p><strong>50 % chance of</strong>
-                <button tabindex="1" class="btn " onclick="crashMeMaybe()">Crash?</button>
+            <p>
+                <button class="btn fullwidth" onclick="crashMeMaybe()">Test error log, 50% crash rate</button>
+            </p>
+            <p>
+                <button class="btn fullwidth" onclick="listusers()">List users in database!</button>
             </p>
 
-            <p><strong>List users in database</strong>
-                <button tabindex="2" class="btn " onclick="listusers()">List them!</button>
+            <p>
+                <button class="btn fullwidth" onclick="readFromPvc()">Read from PVC!</button>
             </p>
 
-            <p><strong>Write a line log</strong>
-                <button tabindex=4" class="btn "
-                        onclick="logthis()">Write it!
+            <p>
+                <input id="logcontent"/>
+                <button class="btn "
+                        onclick="logthis()">Write to info log!
                 </button>
-                <input tabindex="3" id="logcontent"/>
+
             </p>
 
-            <p><strong>Add a user</strong>
-                <button tabindex="6" class="btn "
-                        onclick="addUser()">Add it!
+            <p><strong></strong>
+                <input id="newuser"/>
+                <button class="btn "
+                        onclick="addUser()">Add user to database!
                 </button>
-                <input tabindex="5" id="newuser"/>
             </p>
 
-            <p><strong>Write to PVC</strong>
-                <button tabindex="8" class="btn "
-                        onclick="writeToPvc()">Write it!
+            <p>
+                <input id="fileline"/>
+                <button class="btn "
+                        onclick="writeToPvc()">Write line to PVC
                 </button>
-                <input tabindex="7" id="fileline"/>
-            </p>
 
-            <p><strong>Read from PVC</strong>
-                <button tabindex="9" class="btn " onclick="readFromPvc()">Read it!</button>
             </p>
 
         </div>
@@ -119,6 +132,7 @@
         var frame = document.getElementById("result")
         frame.classList = "active"
     }
+
     function logthis() {
         activeFrame()
         var logline = document.getElementById("logcontent").value
