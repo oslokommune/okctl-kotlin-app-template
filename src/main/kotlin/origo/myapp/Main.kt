@@ -118,8 +118,7 @@ private fun Application.setupRouting(
 
         routing {
             get("/readfrompvc") {
-                val filecontent = readFromPvc()
-                call.respondText(filecontent)
+                call.respondText(readFromPvc())
             }
         }
 
@@ -131,28 +130,38 @@ private fun Application.setupRouting(
 }
 
 private fun Application.writeToPvc(value: String): String {
-    try {
-        val fileName = "/template/local/storage/myfile.txt"
-        val file = File(fileName)
-        file.appendText(value)
-        file.appendText("\n\r")
-        return "Wrote $value to PVC."
-
-
+    val fileName = try {
+        getEnv("PVC_PATH")
     } catch (e: Exception) {
-        return e.message.toString()
+        return "PVC_PATH not set"
+    }
+
+    return try {
+        val file = File(fileName)
+        file.appendText("$value\n\r")
+        "Wrote $value to PVC."
+    } catch (e: Exception) {
+        e.message.toString()
     }
 }
 
 private fun Application.readFromPvc(): String {
-    val fileName = "/template/local/storage/myfile.txt"
+    val fileName = try {
+        getEnv("PVC_PATH")
+    } catch (e: Exception) {
+        return "PVC_PATH not set"
+    }
+
     val myfile = File(fileName)
     var result = ""
     try {
         val readLines = myfile.readLines()
         for (line in readLines) {
-            result += line + "\n\r"
+            if(!line.isNullOrEmpty()) {
+                result = "$line\n$result"
+            }
         }
+
 
     } catch (e: Exception) {
         return e.message.toString()
