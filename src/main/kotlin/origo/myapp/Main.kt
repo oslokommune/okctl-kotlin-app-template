@@ -197,8 +197,8 @@ private fun Application.setupDatabase() {
 
 private fun Application.getUsernames(): ArrayList<String> {
     val usernames = arrayListOf<String>()
-    var datasource : ComboPooledDataSource
-    var database : Database
+    val datasource : ComboPooledDataSource
+    val database : Database
 
     try {
         datasource = getDatasource()
@@ -219,8 +219,13 @@ private fun Application.getUsernames(): ArrayList<String> {
     return usernames
 }
 
-private fun Application.addUser(username: String) {
-    val datasource = getDatasource()
+private fun Application.addUser(username: String) : String {
+    val datasource = try {
+        getDatasource()
+    } catch (e: Exception) {
+        return e.message.toString()
+    }
+
     val database = connectToDatabase(datasource)
 
     database.insert(Users) {
@@ -229,12 +234,12 @@ private fun Application.addUser(username: String) {
     }
 
     datasource.close()
+
+    return "User $username added successfully!"
 }
 
 
 private fun Application.getDatasource(): ComboPooledDataSource {
-    // Database
-    val datasource = ComboPooledDataSource()
 
     val dbEndpoint = try {
         getEnv("DB_ENDPOINT")
@@ -242,6 +247,8 @@ private fun Application.getDatasource(): ComboPooledDataSource {
         throw RuntimeException("DB endpoint not found, set ENV variables found in README to use database")
     }
 
+    // Database
+    val datasource = ComboPooledDataSource()
     log.info("found endpoint " + dbEndpoint)
 
     val dbUsername = getEnv("DB_USERNAME")
