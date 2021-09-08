@@ -52,7 +52,12 @@ fun Application.main() {
 
 
     setupRouting(appMicrometerRegistry)
-    setupDatabase()
+    try {
+        setupDatabase()
+    } catch (e: Exception) {
+        logger.error(e.message)
+    }
+
     logger.info("Application started")
 }
 
@@ -88,7 +93,7 @@ private fun Application.setupRouting(
         // Yes this should be a post, this is not a Ktor refrence app :)
         get("/adduser") {
             val username = call.request.queryParameters["username"]
-            addUser(username.toString())
+            call.respond(addUser(username.toString()))
 
         }
 
@@ -151,7 +156,7 @@ private fun Application.readFromPvc(): String {
         }
 
     } catch (e: Exception) {
-        log.error(e.message)
+        return e.message.toString()
     }
     return result
 }
@@ -192,10 +197,15 @@ private fun Application.setupDatabase() {
 
 private fun Application.getUsernames(): ArrayList<String> {
     val usernames = arrayListOf<String>()
+    var datasource : ComboPooledDataSource
+    var database : Database
 
-    val datasource = getDatasource()
-    val database = connectToDatabase(datasource)
-
+    try {
+        datasource = getDatasource()
+        database = connectToDatabase(datasource)
+    } catch (e: Exception) {
+        return arrayListOf(e.message.toString())
+    }
 
     for (row in database.from(Users).select()) {
         val id: String? = row[Users.id]
@@ -226,32 +236,26 @@ private fun Application.getDatasource(): ComboPooledDataSource {
     // Database
     val datasource = ComboPooledDataSource()
 
-    var found = true
     val dbEndpoint = try {
         getEnv("DB_ENDPOINT")
     } catch (e: Exception) {
-
-        log.info("DB endpoint not found.")
-        log.info("Setting found to false!")
-        found = false
+        throw RuntimeException("DB endpoint not found, set ENV variables found in README to use database")
     }
 
-    if (found) {
-        log.info("found endpoint " + dbEndpoint)
+    log.info("found endpoint " + dbEndpoint)
 
-        val dbUsername = getEnv("DB_USERNAME")
-        val dbPassword = getEnv("DB_PASSWORD")
-        val dbName = getEnv("DB_NAME")
-        val connectString = "jdbc:postgresql://$dbEndpoint/$dbName"
+    val dbUsername = getEnv("DB_USERNAME")
+    val dbPassword = getEnv("DB_PASSWORD")
+    val dbName = getEnv("DB_NAME")
+    val connectString = "jdbc:postgresql://$dbEndpoint/$dbName"
 
 
-        datasource.driverClass = "org.postgresql.ds.PGSimpleDataSource" //Real driver set in connect string.
-        datasource.jdbcUrl = connectString
-        datasource.user = dbUsername
-        datasource.password = dbPassword
+    datasource.driverClass = "org.postgresql.ds.PGSimpleDataSource" //Real driver set in connect string.
+    datasource.jdbcUrl = connectString
+    datasource.user = dbUsername
+    datasource.password = dbPassword
 
-        log.info("Using database: $dbName. Endpoint: $dbEndpoint.")
-    }
+    log.info("Using database: $dbName. Endpoint: $dbEndpoint.")
     return datasource
 
 }
