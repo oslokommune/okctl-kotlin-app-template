@@ -118,7 +118,8 @@ private fun Application.setupRouting(
 
         routing {
             get("/readfrompvc") {
-                call.respondText(readFromPvc())
+                val pvcFileContent = readFromPvc().toString()
+                call.respondText(pvcFileContent)
             }
         }
 
@@ -145,32 +146,36 @@ private fun Application.writeToPvc(value: String): String {
     }
 }
 
-private fun Application.readFromPvc(): String {
+private fun Application.readFromPvc(): ArrayList<String> {
+    val result = arrayListOf<String>()
+
     val fileName = try {
         getEnv("PVC_PATH")
     } catch (e: Exception) {
-        return "PVC_PATH not set"
+        result.add("PVC_PATH not set")
+        return result
     }
 
     val myfile = File(fileName)
-    var result = ""
+
     try {
         val readLines = myfile.readLines()
         for (line in readLines) {
-            if(!line.isNullOrEmpty()) {
-                result = "$line\n$result"
+            if (!line.isNullOrEmpty()) {
+                result.add(line)
             }
         }
 
 
     } catch (e: Exception) {
-        return e.message.toString()
+        result.add(e.message.toString())
     }
     return result
 }
 
 interface User : Entity<User> {
     companion object : Entity.Factory<User>()
+
     val id: String
     val name: String
 }
@@ -203,8 +208,8 @@ private fun Application.setupDatabase() {
 
 private fun Application.getUsernames(): ArrayList<String> {
     val usernames = arrayListOf<String>()
-    val datasource : ComboPooledDataSource
-    val database : Database
+    val datasource: ComboPooledDataSource
+    val database: Database
 
     try {
         datasource = getDatasource()
@@ -225,7 +230,7 @@ private fun Application.getUsernames(): ArrayList<String> {
     return usernames
 }
 
-private fun Application.addUser(username: String) : String {
+private fun Application.addUser(username: String): String {
     val datasource = try {
         getDatasource()
     } catch (e: Exception) {
