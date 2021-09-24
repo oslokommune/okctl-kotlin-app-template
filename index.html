@@ -13,7 +13,7 @@
         }
 
         h1 {
-            font-size: 40px;
+            font-size: 25px;
             width: 50%;
             position: relative;
             left: 25%;
@@ -39,30 +39,39 @@
 
 
         button.fullwidth {
-            width: 100%;
+            width: 50%;
+            float: none;
+            margin-left: 25%;
+            border-radius: 0;
         }
 
         button {
             width: 45%;
-            background-color: #2A2859;
-            color: #fff;
-            float: right
+            background-color: #f9c66b;
+            float: right;
+            border-radius: 0 !important;
 
         }
+
+        button.disabled {
+            background-color: rgb(223, 223, 223)
+        }
+
 
         button:focus {
             color: #fff !important;
         }
 
         button:hover {
-            background-color: #6FE9FF;
+            background-color: #D0BFAE;
             color: black !important;
         }
 
         input {
             line-height: 27px;
             margin-top: 1px;
-            width: 50%;
+            width: 54%;
+            border-radius: 0;
 
         }
 
@@ -76,10 +85,18 @@
             border-style: none;
             width: 50%;
             margin-bottom: 25px;
-            background-color: #f9c66b;
-            border-radius: 25px;
+            background-color: #333333;
             padding: 10px;
             height: 200px;
+        }
+
+        .gopher {
+            width: 15%;
+            margin-top: 20px;
+        }
+
+        .no_input_actions {
+            margin: 35px 0;
         }
 
     </style>
@@ -88,52 +105,72 @@
 <body>
 <div id="app">
     <div class="container">
+        <img class="gopher" src="gopher.png">
         <h1>Okctl super simple reference application</h1>
         <div class="actions">
-            <p>
-                <button class="btn fullwidth" onclick="crashMeMaybe()">Test error log, 50% crash rate</button>
-            </p>
-            <p>
-                <button class="btn fullwidth" onclick="listusers()">List users in database!</button>
-            </p>
+            <div class="no_input_actions">
+                <p>
+                    <button class="btn fullwidth" onclick="crashMeMaybe()">Test error log, 50% crash rate</button>
+                </p>
+                <p>
+                    <button class="btn fullwidth" onclick="listusers()">List users in database!</button>
+                </p>
 
-            <p>
-                <button class="btn fullwidth" onclick="readFromPvc()">Read from PVC!</button>
-            </p>
+                <p>
+                    <button class="btn fullwidth" onclick="readFromPvc()">Read from PVC!</button>
+                </p>
+            </div>
+            <div class="input_actions">
+                <p>
+                    <input id="logcontent" oninput="toggleButton(this)" />
+                    <button class="btn disabled" disabled="true"
+                            onclick="logthis()">Write to info log!
+                    </button>
 
-            <p>
-                <input id="logcontent"/>
-                <button class="btn "
-                        onclick="logthis()">Write to info log!
-                </button>
+                </p>
 
-            </p>
+                <p><strong></strong>
+                    <input id="newuser" oninput="toggleButton(this)" />
+                    <button class="btn disabled" disabled="true"
+                            onclick="addUser()">Add user to database!
+                    </button>
+                </p>
 
-            <p><strong></strong>
-                <input id="newuser"/>
-                <button class="btn "
-                        onclick="addUser()">Add user to database!
-                </button>
-            </p>
+                <p>
+                    <input id="fileline" oninput="toggleButton(this)" />
+                    <button class="btn disabled" disabled="true"
+                            onclick="writeToPvc()">Write line to PVC
+                    </button>
 
-            <p>
-                <input id="fileline"/>
-                <button class="btn "
-                        onclick="writeToPvc()">Write line to PVC
-                </button>
-
-            </p>
+                </p>
+            </div>
 
         </div>
         <br/>
-        <iframe id="result" scrolling="no"></iframe>
+        <iframe id="result" scrolling="no" onload="setFrameTextColor()"></iframe>
         <br/>
-        <img src="gopher.png" style="width:50%">
     </div>
 </div>
 </body>
 
 <script>
+
+    function toggleButton(input) {
+        var button = input.nextElementSibling
+        if(input.value) {
+            button.disabled = false
+            button.classList = "btn"
+        } else {
+            button.classList = "btn disabled"
+            button.disabled = true
+        }
+    }
+
+    function setFrameTextColor() {
+        // Has to be set in JS, since regular CSS won't 'reach' into the iframe
+        var frame = document.getElementById("result")
+        frame.contentWindow.document.body.style.color='white';
+    }
     function activeFrame() {
         var frame = document.getElementById("result")
         frame.classList = "active"
