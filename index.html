@@ -19,6 +19,12 @@
             left: 25%;
         }
 
+        #ingress {
+            width: 50%;
+            position: relative;
+            left: 25%;
+        }
+
         .container {
             text-align: center;
             font-family: oslosans;
@@ -107,6 +113,11 @@
     <div class="container">
         <img class="gopher" src="gopher.png">
         <h1>Okctl super simple reference application</h1>
+        <p id="ingress">
+            This app offers some simple functionality to test your app in an okctl-cluster.
+            You can head over to <a id="grafanaLink">Grafana</a> to see your logs, and <a id="argocdLink">ArgoCD</a> to see your continuous integration tool.
+        </p>
+
         <div class="actions">
             <div class="no_input_actions">
                 <p>
@@ -154,6 +165,17 @@
 </body>
 
 <script>
+
+    function setLinks() {
+        var argocdLink = document.getElementById("argocdLink")
+        var grafanaLink = document.getElementById("grafanaLink")
+
+        var host = window.location.host
+        root = host.substring(host.indexOf('.')+1)
+
+        grafanaLink.href = `https://grafana.${root}`
+        argocdLink.href = `https://argocd.${root}`
+    }
 
     function toggleButton(input) {
         var button = input.nextElementSibling
@@ -214,6 +236,10 @@
         var frame = document.getElementById("result")
         frame.src = "/readfrompvc"
     }
+
+    document.addEventListener("DOMContentLoaded", function(event) {
+        setLinks()
+    });
 
 </script>
 </html>
