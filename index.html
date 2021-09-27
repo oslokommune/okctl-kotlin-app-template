@@ -14,15 +14,12 @@
 
         h1 {
             font-size: 25px;
-            width: 50%;
+
             position: relative;
-            left: 25%;
         }
 
         #ingress {
-            width: 50%;
             position: relative;
-            left: 25%;
         }
 
         .container {
@@ -33,8 +30,6 @@
         .actions {
             text-align: left;
             position: relative;
-            left: 25%;
-            width: 50%;
             margin-top: 25px;
         }
 
@@ -105,61 +100,68 @@
             margin: 35px 0;
         }
 
+        .content {
+            margin: 0 auto;
+            float: none
+        }
+
     </style>
     <title>Demo okctl app</title>
 </head>
 <body>
 <div id="app">
     <div class="container">
-        <img class="gopher" src="gopher.png">
-        <h1>Okctl super simple reference application</h1>
-        <p id="ingress">
-            This app offers some simple functionality to test your app in an okctl-cluster.
-            You can head over to <a id="grafanaLink">Grafana</a> to see your logs, and <a id="argocdLink">ArgoCD</a> to see your continuous integration tool.
-        </p>
+        <div class="content col-xl-6 col-lg-8 col-md-10 col-sm-12">
+            <img class="gopher" src="gopher.png">
+            <h1>Okctl super simple reference application</h1>
+            <p id="ingress">
+                This app offers some simple functionality to test your app in an okctl-cluster.
+                You can head over to <a id="grafanaLink">Grafana</a> to see your logs, and <a id="argocdLink">ArgoCD</a> to see your continuous integration tool.
+            </p>
 
-        <div class="actions">
-            <div class="no_input_actions">
-                <p>
-                    <button class="btn fullwidth" onclick="crashMeMaybe()">Test error log, 50% crash rate</button>
-                </p>
-                <p>
-                    <button class="btn fullwidth" onclick="listusers()">List users in database!</button>
-                </p>
+            <div class="actions">
+                <div class="no_input_actions">
+                    <p>
+                        <button class="btn fullwidth" onclick="crashMeMaybe()">Test error log, 50% crash rate</button>
+                    </p>
+                    <p>
+                        <button class="btn fullwidth" onclick="listusers()">List users in database!</button>
+                    </p>
 
-                <p>
-                    <button class="btn fullwidth" onclick="readFromPvc()">Read from PVC!</button>
-                </p>
+                    <p>
+                        <button class="btn fullwidth" onclick="readFromPvc()">Read from PVC!</button>
+                    </p>
+                </div>
+                <div class="input_actions">
+                    <p>
+                        <input id="logcontent" oninput="toggleButton(this)" />
+                        <button class="btn disabled" disabled="true"
+                                onclick="logthis()">Write to info log!
+                        </button>
+
+                    </p>
+
+                    <p><strong></strong>
+                        <input id="newuser" oninput="toggleButton(this)" />
+                        <button class="btn disabled" disabled="true"
+                                onclick="addUser()">Add user to database!
+                        </button>
+                    </p>
+
+                    <p>
+                        <input id="fileline" oninput="toggleButton(this)" />
+                        <button class="btn disabled" disabled="true"
+                                onclick="writeToPvc()">Write line to PVC
+                        </button>
+
+                    </p>
+                </div>
+
             </div>
-            <div class="input_actions">
-                <p>
-                    <input id="logcontent" oninput="toggleButton(this)" />
-                    <button class="btn disabled" disabled="true"
-                            onclick="logthis()">Write to info log!
-                    </button>
-
-                </p>
-
-                <p><strong></strong>
-                    <input id="newuser" oninput="toggleButton(this)" />
-                    <button class="btn disabled" disabled="true"
-                            onclick="addUser()">Add user to database!
-                    </button>
-                </p>
-
-                <p>
-                    <input id="fileline" oninput="toggleButton(this)" />
-                    <button class="btn disabled" disabled="true"
-                            onclick="writeToPvc()">Write line to PVC
-                    </button>
-
-                </p>
-            </div>
-
+            <br/>
+            <iframe id="result" scrolling="no" onload="setFrameTextColor()"></iframe>
+            <br/>
         </div>
-        <br/>
-        <iframe id="result" scrolling="no" onload="setFrameTextColor()"></iframe>
-        <br/>
     </div>
 </div>
 </body>
