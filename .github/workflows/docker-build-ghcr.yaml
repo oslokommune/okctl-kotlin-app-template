@@ -64,10 +64,14 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.CLUSTER_DEPLOY_KEY_DEMO }}
 
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
       - name: Update IAC repo with image
         env:
           CONTAINER_NAME: ghcr.io/oslokommune/okctl-kotlin-app-template
-          IMAGE_TAG: ${{ github.ref }}
+          IMAGE_TAG: ${VERSION}
           DEPLOYMENT_YAML_FILE: infrastructure/applications/demo-app/overlays/okctl-demo-dev/deployment-patch.json
         run: |
           # Update image tag
