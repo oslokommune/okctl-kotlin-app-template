@@ -30,12 +30,12 @@ jobs:
       - name: Update IAC repo with image
         env:
           CONTAINER_NAME: ghcr.io/oslokommune/okctl-kotlin-app-template
-          IMAGE_TAG: v0.0.1337
+          IMAGE_TAG: ${{ github.version }}
           DEPLOYMENT_YAML_FILE: infrastructure/applications/demo-app/overlays/okctl-demo-dev/deployment-patch.json
         run: |
-          env
           echo $version
-          echo ${ github.ref }
+          echo $IMAGE_TAG
+
 
           # Update image tag
           sudo apt install jq
