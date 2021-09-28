@@ -26,8 +26,9 @@ jobs:
           CONTAINER_NAME: ghcr.io/oslokommune/okctl-kotlin-app-template
           DEPLOYMENT_YAML_FILE: infrastructure/applications/demo-app/overlays/okctl-demo-dev/deployment-patch.json
         run: |
-          echo "Beofre tag"
-          git describe --tags `git rev-list --tags --max-count=1`
+          echo $GITHUB_REF
+          
+          # IMAGE_TAG: ${{ GITHUB_REF/#refs\/tags\/ }}
 
         working-directory: .
 
