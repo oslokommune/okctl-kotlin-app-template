@@ -1,4 +1,4 @@
-name: Docker build and push to ghcr
+name: Temp debug action
 
 on:
   workflow_dispatch:
@@ -8,8 +8,6 @@ on:
 
 jobs:
   update-tag:
-    needs: docker-build-push
-
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job.
