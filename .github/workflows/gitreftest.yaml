@@ -32,7 +32,7 @@ jobs:
       - name: Update IAC repo with image
         env:
           CONTAINER_NAME: ghcr.io/oslokommune/okctl-kotlin-app-template
-          IMAGE_TAG: ${{ version }}
+          IMAGE_TAG: v0.0.1337
           DEPLOYMENT_YAML_FILE: infrastructure/applications/demo-app/overlays/okctl-demo-dev/deployment-patch.json
         run: |
           echo ${env}
