@@ -22,7 +22,7 @@ jobs:
 
 
 
-      - run: VERSION=$(git describe --tags `git rev-list --tags --max-count=1`)"
+      - run: VERSION=$(git describe --tags `git rev-list --tags --max-count=1`)
         id: version_store
 
       - name: Update IAC repo with image
