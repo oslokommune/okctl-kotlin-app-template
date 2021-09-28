@@ -22,7 +22,8 @@ jobs:
 
 
 
-      - run: echo "imagetag=$(git describe --tags `git rev-list --tags --max-count=1`)" >> $GITHUB_ENV
+      - run: echo "version=$(git describe --tags `git rev-list --tags --max-count=1`)" >> $GITHUB_ENV
+        id: version_store
 
       - name: Update IAC repo with image
         env:
@@ -30,8 +31,9 @@ jobs:
           DEPLOYMENT_YAML_FILE: infrastructure/applications/demo-app/overlays/okctl-demo-dev/deployment-patch.json
         run: |
           echo "Beofre tag"
-          echo ${{ env.imagetag }}
-          
+          echo ${{ env.version }}
+
+
 
 
 
