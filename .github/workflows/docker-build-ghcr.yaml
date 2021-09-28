@@ -44,3 +44,50 @@ jobs:
 
       - name: Push docker image
         run: docker push ${{ env.tag }}:${{ env.version }}
+
+  update-tag:
+    needs: docker-build-push
+
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job.
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Repository name with owner. For example, actions/checkout
+          # Default: ${{ github.repository }}
+          repository: 'oslokommune/okctl-demo-iac'
+          ref: 'main'
+          ssh-key: '${{ secrets.CLUSTER_DEPLOY_KEY_DEMO }}'
+
+      - uses: webfactory/ssh-agent@v0.5.2
+        with:
+          ssh-private-key: ${{ secrets.CLUSTER_DEPLOY_KEY_DEMO }}
+
+      - name: Update IAC repo with image
+        env:
+          CONTAINER_NAME: ghcr.io/oslokommune/okctl-kotlin-app-template
+          IMAGE_TAG: ${{ github.ref }}
+          DEPLOYMENT_YAML_FILE: infrastructure/applications/demo-app/overlays/okctl-demo-dev/deployment-patch.json
+        run: |
+          # Update image tag
+          sudo apt install jq
+          image=$(jq -r '.[] | select(.path=="/spec/template/spec/containers/0/image").value' ${DEPLOYMENT_YAML_FILE})
+
+          if [[ "$image" == *":"* ]]; then
+            tag=$(echo $image | cut -d ":" -f2)
+            newimage=$(sed "s#$tag#$IMAGE_TAG#" <<< $image)
+            sed -i "s#$image#$newimage#" $DEPLOYMENT_YAML_FILE
+          else
+           sed -i "s#$image#$image:$IMAGE_TAG#" $DEPLOYMENT_YAML_FILE
+          fi
+
+          # Update IAC repository
+          git config --global user.email "no-reply@origo.oslo.kommune.no"
+          git config --global user.name "Github actions"
+
+          git add $DEPLOYMENT_YAML_FILE
+          git commit -m "Update deployment.yaml image tag"
+          git push
+
+        working-directory: .
