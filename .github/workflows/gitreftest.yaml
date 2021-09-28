@@ -22,18 +22,17 @@ jobs:
 
 
 
-      - run: echo "version=$(git describe --tags `git rev-list --tags --max-count=1`)" >> $GITHUB_ENV
+      - run: VERSION=$(git describe --tags `git rev-list --tags --max-count=1`)"
         id: version_store
 
       - name: Update IAC repo with image
         env:
           CONTAINER_NAME: ghcr.io/oslokommune/okctl-kotlin-app-template
-          IMAGE_TAG: ${{ env.version }}
+          IMAGE_TAG: ${{ VERSION }}
           DEPLOYMENT_YAML_FILE: infrastructure/applications/demo-app/overlays/okctl-demo-dev/deployment-patch.json
         run: |
           echo "Beofre tag"
           echo $IMAGE_TAG
           echo "After tag"
-          echo $GITHUB_ENV
-          echo $GITHUB_VERSION
-          
+
+
