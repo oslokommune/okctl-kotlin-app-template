@@ -20,15 +20,15 @@ jobs:
           ref: 'main'
           ssh-key: '${{ secrets.CLUSTER_DEPLOY_KEY_DEMO }}'
 
-
+      #  IMAGE_TAG: ${{ GITHUB_REF/#refs\/tags\/ }}
       - name: Update IAC repo with image
         env:
           CONTAINER_NAME: ghcr.io/oslokommune/okctl-kotlin-app-template
           DEPLOYMENT_YAML_FILE: infrastructure/applications/demo-app/overlays/okctl-demo-dev/deployment-patch.json
         run: |
           echo $GITHUB_REF
-          
-          # IMAGE_TAG: ${{ GITHUB_REF/#refs\/tags\/ }}
+
+
 
         working-directory: .
 
