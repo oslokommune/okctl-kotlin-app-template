@@ -27,7 +27,8 @@ jobs:
           DEPLOYMENT_YAML_FILE: infrastructure/applications/demo-app/overlays/okctl-demo-dev/deployment-patch.json
         run: |
           echo $GITHUB_REF
-
+          TEMP=${GITHUB_REF/#refs\/heads\/}
+          echo $TEMP
 
 
         working-directory: .
