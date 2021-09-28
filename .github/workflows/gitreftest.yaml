@@ -1,0 +1,56 @@
+name: Docker build and push to ghcr
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'gitref'
+
+jobs:
+  update-tag:
+    needs: docker-build-push
+
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job.
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Repository name with owner. For example, actions/checkout
+          # Default: ${{ github.repository }}
+          repository: 'oslokommune/okctl-demo-iac'
+          ref: 'main'
+          ssh-key: '${{ secrets.CLUSTER_DEPLOY_KEY_DEMO }}'
+
+      - uses: webfactory/ssh-agent@v0.5.2
+        with:
+          ssh-private-key: ${{ secrets.CLUSTER_DEPLOY_KEY_DEMO }}
+
+      - run: echo "version=$(git describe --tags `git rev-list --tags --max-count=1`)" >> $GITHUB_ENV
+        id: version_store
+
+      - name: Update IAC repo with image
+        env:
+          CONTAINER_NAME: ghcr.io/oslokommune/okctl-kotlin-app-template
+          IMAGE_TAG: ${{ version }}
+          DEPLOYMENT_YAML_FILE: infrastructure/applications/demo-app/overlays/okctl-demo-dev/deployment-patch.json
+        run: |
+          echo ${env}
+          echo ${version}
+          echo ${github.ref}
+
+          # Update image tag
+          sudo apt install jq
+          image=$(jq -r '.[] | select(.path=="/spec/template/spec/containers/0/image").value' ${DEPLOYMENT_YAML_FILE})
+
+          if [[ "$image" == *":"* ]]; then
+            tag=$(echo $image | cut -d ":" -f2)
+            newimage=$(sed "s#$tag#$IMAGE_TAG#" <<< $image)
+            sed -i "s#$image#$newimage#" $DEPLOYMENT_YAML_FILE
+          else
+           sed -i "s#$image#$image:$IMAGE_TAG#" $DEPLOYMENT_YAML_FILE
+          fi
+
+
+
+        working-directory: .
