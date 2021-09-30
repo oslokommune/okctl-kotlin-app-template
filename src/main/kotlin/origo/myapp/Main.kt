@@ -134,8 +134,9 @@ private fun Application.writeToPvc(value: String): String {
     val fileName = try {
         getEnv("PVC_PATH")
     } catch (e: Exception) {
-        return "PVC_PATH not set"
+        return pvcConfigError()
     }
+
 
     return try {
         val file = File(fileName)
@@ -146,13 +147,19 @@ private fun Application.writeToPvc(value: String): String {
     }
 }
 
+private fun Application.pvcConfigError(): String {
+    return "PVC is not configured correctly.\n" +
+"You need to set PVC_PATH environment variable.\n\n" +
+"For more information, see https://okctl.io/help/setup-reference-app/"
+}
+
 private fun Application.readFromPvc(): ArrayList<String> {
     val result = arrayListOf<String>()
 
     val fileName = try {
         getEnv("PVC_PATH")
     } catch (e: Exception) {
-        result.add("PVC_PATH not set")
+        result.add(pvcConfigError())
         return result
     }
 
@@ -255,7 +262,10 @@ private fun Application.getDatasource(): ComboPooledDataSource {
     val dbEndpoint = try {
         getEnv("DB_ENDPOINT")
     } catch (e: Exception) {
-        throw RuntimeException("DB endpoint not found, set ENV variables found in README to use database")
+        throw RuntimeException("Database is not configured correctly.\n" +
+"You need to set the following environment variables:\n" +
+"DB_ENDPOINT, DB_USERNAME, DB_PASSWORD and DB_NAME.\n\n" +
+"For more information, see https://okctl.io/help/setup-reference-app/")
     }
 
     // Database
