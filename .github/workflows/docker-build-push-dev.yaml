@@ -38,7 +38,7 @@ jobs:
         id: push
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: okctl-reference-iac
+          ECR_REPOSITORY: okctl-reference-app
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -66,7 +66,7 @@ jobs:
 
       - name: Update IAC repo with image
         env:
-          CONTAINER_NAME: kotlin-test-app
+          CONTAINER_NAME: okctl-reference-app
           IMAGE_TAG: ${{ github.sha }}
           DEPLOYMENT_YAML_FILE: /infrastructure/applications/okctl-reference-app/overlays/okctl-reference-dev/deployment-patch.json
         run: |
