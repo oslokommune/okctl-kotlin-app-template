@@ -62,7 +62,7 @@ jobs:
 
       - uses: webfactory/ssh-agent@v0.5.2
         with:
-          ssh-private-key: ${{ secrets.CLUSTER_DEPLOY_KEY }}
+          ssh-private-key: ${{ secrets.CLUSTER_DEPLOY_KEY_DEMO }}
 
       - name: Update IAC repo with image
         env:
