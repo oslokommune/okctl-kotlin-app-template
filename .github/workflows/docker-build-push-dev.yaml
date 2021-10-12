@@ -68,7 +68,7 @@ jobs:
         env:
           CONTAINER_NAME: okctl-reference-app
           IMAGE_TAG: ${{ github.sha }}
-          DEPLOYMENT_YAML_FILE: /infrastructure/applications/okctl-reference-app/overlays/okctl-reference-dev/deployment-patch.json
+          DEPLOYMENT_YAML_FILE: infrastructure/applications/okctl-reference-app/overlays/okctl-reference-dev/deployment-patch.json
         run: |
           # Update image tag
           sudo apt install jq
