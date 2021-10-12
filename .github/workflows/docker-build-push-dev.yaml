@@ -58,6 +58,7 @@ jobs:
           # Default: ${{ github.repository }}
           repository: 'oslokommune/okctl-reference-iac'
           ref: 'main'
+          # Private key in secret for app-repo, public key as a read/write deploy key in iac-repo
           ssh-key: '${{ secrets.CLUSTER_DEPLOY_KEY }}'
 
       - uses: webfactory/ssh-agent@v0.5.2
