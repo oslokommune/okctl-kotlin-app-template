@@ -1,6 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-
-name: Docker build and push
+name: Docker build and push to ghcr for prod
 
 on:
   workflow_dispatch:
@@ -10,45 +8,41 @@ on:
 
 jobs:
   docker-build-push:
-    # https://docs.github.com/en/actions/reference/environments#about-environments
-    environment: prod
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Map a step output to a job output
-    # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idoutputs
-    outputs:
-      image-uri: ${{ steps.push.outputs.image-uri }}
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_ECR_ACCESS_KEY_SECRET }}
-          aws-region: eu-west-1
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with:
-          fetch-depth: '0' # Recommended to use by https://github.com/anothrNick/github-tag-action/blame/master/README.md#L35
+          fetch-depth: '1'
+      # We use GHCR in this example to show how another package repository can be used with okcl.
+      - name: Login to GitHub Packages Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: push
+      - name: Github Tag Bump
+        id: bump_version
+        uses: anothrNick/github-tag-action@18284c78f6ac68868d5341f57c4f971fb5b7605c # 1.34.0
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: kotlin-test-app
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        working-directory: .
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
+          RELEASE_BRANCHES: main
+          WITH_V: true
+
+      - run: echo "tag=ghcr.io/oslokommune/okctl-reference-app" >> $GITHUB_ENV
+        id: tag_store
+      - run: echo "version=$(git describe --tags `git rev-list --tags --max-count=1`)" >> $GITHUB_ENV
+        id: version_store
+
+      - name: Build and push Docker images
+        run: docker build -t ${{ env.tag }}:${{ env.version }} .
+
+      - name: Push docker image
+        run: docker push ${{ env.tag }}:${{ env.version }}
 
   update-tag:
     needs: docker-build-push
@@ -61,7 +55,7 @@ jobs:
         with:
           # Repository name with owner. For example, actions/checkout
           # Default: ${{ github.repository }}
-          repository: 'oslokommune/okctl-template-iac'
+          repository: 'oslokommune/okctl-reference-iac'
           ref: 'main'
           ssh-key: '${{ secrets.CLUSTER_DEPLOY_KEY }}'
 
@@ -71,11 +65,11 @@ jobs:
 
       - name: Update IAC repo with image
         env:
-          # TODO move this to somewhere else, higher up in the chain
-          CONTAINER_NAME: okctl-kotlin-app-template-dev
-          IMAGE_TAG: ${{ github.sha }}
-          DEPLOYMENT_YAML_FILE: infrastructure/applications/kotlin-test-app/overlays/okctl-template-prod/deployment-patch.json
+          CONTAINER_NAME: ghcr.io/oslokommune/okctl-reference-app
+          DEPLOYMENT_YAML_FILE: infrastructure/applications/okctl-reference-app/overlays/okctl-reference/deployment-patch.json
         run: |
+          IMAGE_TAG=${GITHUB_REF/#refs\/tags\/}
+
           # Update image tag
           sudo apt install jq
           image=$(jq -r '.[] | select(.path=="/spec/template/spec/containers/0/image").value' ${DEPLOYMENT_YAML_FILE})
@@ -97,4 +91,3 @@ jobs:
           git push
 
         working-directory: .
-

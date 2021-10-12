@@ -1,6 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-
-name: Build and deploy
+name: Build and deploy to ecr for dev
 
 on:
   workflow_dispatch:
