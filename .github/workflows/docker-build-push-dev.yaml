@@ -58,7 +58,7 @@ jobs:
           # Default: ${{ github.repository }}
           repository: 'oslokommune/okctl-reference-iac'
           ref: 'main'
-          ssh-key: '${{ secrets.CLUSTER_DEPLOY_KEY }}'
+          ssh-key: '${{ secrets.CLUSTER_DEPLOY_KEY_DEMO }}'
 
       - uses: webfactory/ssh-agent@v0.5.2
         with:
