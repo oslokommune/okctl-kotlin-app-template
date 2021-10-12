@@ -58,11 +58,11 @@ jobs:
           # Default: ${{ github.repository }}
           repository: 'oslokommune/okctl-reference-iac'
           ref: 'main'
-          ssh-key: '${{ secrets.CLUSTER_DEPLOY_KEY_DEMO }}'
+          ssh-key: '${{ secrets.CLUSTER_DEPLOY_KEY }}'
 
       - uses: webfactory/ssh-agent@v0.5.2
         with:
-          ssh-private-key: ${{ secrets.CLUSTER_DEPLOY_KEY_DEMO }}
+          ssh-private-key: ${{ secrets.CLUSTER_DEPLOY_KEY }}
 
       - name: Update IAC repo with image
         env:
