@@ -85,6 +85,7 @@ jobs:
           git config --global user.email "no-reply@origo.oslo.kommune.no"
           git config --global user.name "Github actions"
 
+          git pull
           git add $DEPLOYMENT_YAML_FILE
           git commit -m "Update deployment.yaml image tag"
           git push
