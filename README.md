@@ -20,3 +20,4 @@ Run tests
 
 See: [Documentation](https://okctl.io/help/setup-reference-app/)
 
+Example iac-repo [here](https://github.com/oslokommune/okctl-reference-iac)
