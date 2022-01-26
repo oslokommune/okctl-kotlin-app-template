@@ -226,7 +226,6 @@ private fun Application.getUsernames(): ArrayList<String> {
     }
 
     for (row in database.from(Users).select()) {
-        val id: String? = row[Users.id]
         val name: String? = row[Users.name]
 
         if (!name.isNullOrEmpty()) {
