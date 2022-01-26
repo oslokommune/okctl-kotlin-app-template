@@ -13,11 +13,11 @@ val applicationVersion = "0.0.1-SNAPSHOT"
 
 group = "origo.myproduct"
 version = applicationVersion
-java.sourceCompatibility = JavaVersion.VERSION_15
-java.targetCompatibility = JavaVersion.VERSION_15
+java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = "15"
+    kotlinOptions.jvmTarget = "17"
 }
 
 println("Using java version: " + JavaVersion.current())
