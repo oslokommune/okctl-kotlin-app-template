@@ -2,8 +2,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-    val kotlinversion = "1.4.31"
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    val kotlinversion = "1.6.10"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("jvm") version kotlinversion
     kotlin("plugin.serialization") version kotlinversion
     application
@@ -13,11 +13,11 @@ val applicationVersion = "0.0.1-SNAPSHOT"
 
 group = "origo.myproduct"
 version = applicationVersion
-java.sourceCompatibility = JavaVersion.VERSION_15
-java.targetCompatibility = JavaVersion.VERSION_15
+java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = "15"
+    kotlinOptions.jvmTarget = "17"
 }
 
 println("Using java version: " + JavaVersion.current())
@@ -35,16 +35,16 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     // Logging
-    implementation("ch.qos.logback:logback-classic:1.2.3")
-    implementation("ch.qos.logback:logback-core:1.2.3")
-    implementation("org.slf4j:slf4j-api:1.7.26")
-    implementation("io.github.microutils:kotlin-logging:1.7.8")
+    implementation("ch.qos.logback:logback-classic:1.2.10")
+    implementation("ch.qos.logback:logback-core:1.2.10")
+    implementation("org.slf4j:slf4j-api:1.7.35")
+    implementation("io.github.microutils:kotlin-logging:2.1.21")
 
     // Testing
-    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
 
     // KTor
-    val ktor_version = "1.5.2"
+    val ktor_version = "1.6.7"
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("io.ktor:ktor-locations:$ktor_version")
     implementation("io.ktor:ktor-gson:$ktor_version")
@@ -55,22 +55,22 @@ dependencies {
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
 
     // Database
-    implementation("org.postgresql:postgresql:42.2.20")
-    implementation("org.flywaydb:flyway-core:7.8.2")
+    implementation("org.postgresql:postgresql:42.3.1")
+    implementation("org.flywaydb:flyway-core:8.4.2")
     implementation("com.mchange:c3p0:0.9.5.5")
 
     // Database ORM: Ktorm
-    val ktorm_version = "3.3.0"
+    val ktorm_version = "3.4.1"
     implementation("org.ktorm:ktorm-core:$ktorm_version")
     implementation( "org.ktorm:ktorm-support-postgresql:${ktorm_version}")
 
-    // Note: 2.10.2 is the relevant jackson-version as of ktor-jackson 1.5.2. Keep an eye on this when upgrading ktor.
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.2")
+    // Note: 2.13.1 is the relevant jackson-version as of ktor-jackson 1.6.7. Keep an eye on this when upgrading ktor.
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1")
 
     // Metrics
     implementation ("io.ktor:ktor-metrics:$ktor_version")
     implementation ("io.ktor:ktor-metrics-micrometer:$ktor_version")
-    implementation ("io.micrometer:micrometer-registry-prometheus:1.3.1")
+    implementation ("io.micrometer:micrometer-registry-prometheus:1.8.2")
 
 }
 

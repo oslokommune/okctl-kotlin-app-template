@@ -202,7 +202,6 @@ private fun Application.setupDatabase() {
         val flywayConfig = ClassicConfiguration()
         flywayConfig.setLocations(Location("classpath:/sql/migrations/"))
         flywayConfig.dataSource = datasource
-        flywayConfig.isIgnoreMissingMigrations = true
         flywayConfig.setBaselineVersionAsString("1")
         flywayConfig.isBaselineOnMigrate = true
         val flyway = Flyway(flywayConfig)
@@ -226,7 +225,6 @@ private fun Application.getUsernames(): ArrayList<String> {
     }
 
     for (row in database.from(Users).select()) {
-        val id: String? = row[Users.id]
         val name: String? = row[Users.name]
 
         if (!name.isNullOrEmpty()) {
