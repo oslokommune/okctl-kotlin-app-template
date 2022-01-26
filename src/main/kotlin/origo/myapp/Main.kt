@@ -202,7 +202,6 @@ private fun Application.setupDatabase() {
         val flywayConfig = ClassicConfiguration()
         flywayConfig.setLocations(Location("classpath:/sql/migrations/"))
         flywayConfig.dataSource = datasource
-        flywayConfig.isIgnoreMissingMigrations = true
         flywayConfig.setBaselineVersionAsString("1")
         flywayConfig.isBaselineOnMigrate = true
         val flyway = Flyway(flywayConfig)
