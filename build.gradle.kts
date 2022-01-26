@@ -2,7 +2,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-    val kotlinversion = "1.4.31"
+    val kotlinversion = "1.6.10"
     id("com.github.johnrengelman.shadow") version "7.0.0"
     kotlin("jvm") version kotlinversion
     kotlin("plugin.serialization") version kotlinversion
