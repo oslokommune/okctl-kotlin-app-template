@@ -14,30 +14,60 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint
+    permissions:
+      id-token: write
+      contents: read
+
+    outputs:
+      # Tag when pushing image to ECR and updating IAC repo
+      IMAGE_TAG: ${{ steps.tag.outputs.IMAGE_TAG }}
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_ECR_ACCESS_KEY_SECRET }}
-          aws-region: eu-west-1
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with:
           fetch-depth: '0' # Recommended to use by https://github.com/anothrNick/github-tag-action/blame/master/README.md#L35
 
+      #####
+      # Will generate a tag in the following format: `2021-11-22Z.01e3dd9.10327`
+      # Set as image tag when pushed to ECR and for updating the image tag
+      # in the IAC-repo (see "update-iac-tag" below)
+      - name: Generate image tag
+        id: tag
+        env:
+          HASH: ${{ github.sha }}
+        run: |
+          stamp=$(date -u +%FZ)
+          short_sha=$(git rev-parse --short $HASH)
+          tag="$stamp.$short_sha.$RANDOM"
+          echo "::set-output name=IMAGE_TAG::$tag"
+        working-directory: .
+
+      #####
+      # Set up and login to your AWS account
+      - uses: aws-actions/configure-aws-credentials@v1
+        name: Configure the AWS credentials
+        with:
+          aws-region: eu-west-1
+          # The full ARN for the role created in terraform
+          role-to-assume: ${{ secrets.DEV_REFERENCE_APP_ECR_PUSH_ROLE }}
+
+      - uses: aws-actions/amazon-ecr-login@v1
+        name: Login to Amazon ECR
+        id: login-ecr
+
+      #####
+      # At this point we are logged in and have assumed a role
+      # in AWS, you can now interact with the AWS resources
+      # that your role permits you to
       - name: Build, tag, and push image to Amazon ECR
-        id: push
+        id: build-and-push
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: okctl-reference-app
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ steps.tag.outputs.IMAGE_TAG }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -66,7 +96,7 @@ jobs:
       - name: Update IAC repo with image
         env:
           CONTAINER_NAME: okctl-reference-app
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ needs.docker-build-push.outputs.IMAGE_TAG }}
           DEPLOYMENT_YAML_FILE: infrastructure/applications/okctl-reference-app/overlays/okctl-reference-dev/deployment-patch.json
         run: |
           # Update image tag
