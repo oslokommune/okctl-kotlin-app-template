@@ -1,5 +1,9 @@
 #!/bin/bash
 
+## NOTE ##
+# This script currently works on linux, not on MacOSX
+##########
+
 set -e
 
 debug_flag='true'
