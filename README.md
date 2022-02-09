@@ -23,11 +23,12 @@ See: [Documentation](https://www.okctl.io/set-up-a-reference-application-full-ex
 Example iac-repo [here](https://github.com/oslokommune/okctl-reference-iac)
 
 # Configuration
-## Terraform
-See [documentation](tf/README.md) for configuration
 
-## .gihub/workflows/release.yaml variables
-The `.github/workflows/release.yaml` uses a OIDC setup for allowing github to push images to AWS ECR.
+## Terraform
+See [documentation](tf/README.md) for configuration of Github OIDC connector and IAM roles in your AWS account.
+
+## .gihub/workflows/docker-build-push-dev.yaml variables
+The `.github/workflows/docker-build-push-dev.yaml` uses a OIDC setup for allowing github to push images to AWS ECR.
 
 OIDC is used because we want to:
 * Avoid use of long-lived access keys, rather use one-time tokens between github and aws
@@ -36,11 +37,11 @@ OIDC is used because we want to:
 
 If you have other needs in terms of pushing resources to AWS: update the `build-and-push` step (and the corresponding role in terraform)
 
-### Variables to update in .gihub/workflows/docker-build-push-*.yaml
+### Variables to update in .gihub/workflows/docker-build-push-\*.yaml
 * `branches`: on which branch(es) do you want to push the image to ECR
 * `aws-region`: the location of your infrastructure
 * `ECR_REPOSITORY`: Name of ECR repository in AWS, created by okctl application
-* `repository`: The {organization}/{okct-config} repo containing your okctl IAC code
+* `repository`: The {organization}/{okctl-config} repo containing your okctl IAC code
 * `ref`: branch name you are using (main/master) for your IAC repo
 * `DEPLOYMENT_YAML_FILE`: path to your application deployment patch
 * The git commit message at the end of `jobs.update-tag`

@@ -1,7 +1,7 @@
 Terraform for okctl-reference-app
 =====
 
-This Terraform configuration creates resources that enable a Github repository to push images to Elastic Container Repository (ECR) in your AWS account.
+This Terraform configuration enables a Github repository to push images to Elastic Container Repository (ECR) in your AWS account while authenticating using OpenID Connect. This avoids having to configure (long-lived) IAM access keys as secrets in Github.
 
 Terraform will output the IAM role [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) which you can use to configure your Github action.
 

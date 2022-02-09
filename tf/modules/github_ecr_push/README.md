@@ -45,10 +45,10 @@ Configuration options:
 ### Github action config
 
 In the corresponding Github repo, the Github Action that will push the image
-to ECR must be set up to use the newly created role. The `ARN` of the IAM
-role created by the module will be output by Terraform. Put the value in a
-Github Actions secret in your repository, e.g. `ECR_PUSH_ROLE`. Add the
-following snippet to your Github Action configuration:
+to ECR must be set up to use the newly created role. Locate the `ARN` of the
+IAM role created by Terraform and put the value in a Github Actions secret
+in your repository, e.g. `ECR_PUSH_ROLE`. Add the following snippet to your
+Github Action configuration:
 
 ```yaml
 jobs:
