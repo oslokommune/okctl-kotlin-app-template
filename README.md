@@ -18,7 +18,7 @@ Run tests
 
 # Run in okctl cluster
 
-See: [Documentation](https://okctl.io/help/setup-reference-app/)
+See: [Documentation](https://www.okctl.io/set-up-a-reference-application-full-example/)
 
 Example iac-repo [here](https://github.com/oslokommune/okctl-reference-iac)
 
