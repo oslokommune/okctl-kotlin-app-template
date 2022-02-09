@@ -4,7 +4,8 @@ variable "name" {
 }
 
 variable "oidc_provider_arn" {
-  type = string
+  type        = string
+  description = "Github OIDC provider ARN"
 }
 
 variable "github_account" {
