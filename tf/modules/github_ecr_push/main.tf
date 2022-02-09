@@ -9,6 +9,23 @@ data "aws_ecr_repository" "this" {
   name = local.ecr_repo
 }
 
+resource "aws_iam_role" "this" {
+  name        = "${var.name}-github-ecr-push"
+  path        = "/github_actions/"
+  description = "Allow pushing images to ECR repo ${local.ecr_repo} from Github Actions in repo ${local.github_account}/${local.github_repo} using OpenID Connect."
+
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+
+  inline_policy {
+    name   = "${var.name}-github-ecr-push"
+    policy = data.aws_iam_policy_document.ecr_upload.json
+  }
+
+  managed_policy_arns = []
+
+  tags = local.tags
+}
+
 data "aws_iam_policy_document" "assume_role" {
   statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
@@ -53,21 +70,4 @@ data "aws_iam_policy_document" "ecr_upload" {
 
     resources = ["*"]
   }
-}
-
-resource "aws_iam_role" "this" {
-  name        = "${var.name}-github-ecr-push"
-  path        = "/github_actions/"
-  description = "Allow pushing images to ECR repo ${local.ecr_repo} from Github Actions in repo ${local.github_account}/${local.github_repo} using OpenID Connect."
-
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
-
-  inline_policy {
-    name   = "${var.name}-github-ecr-push"
-    policy = data.aws_iam_policy_document.ecr_upload.json
-  }
-
-  managed_policy_arns = []
-
-  tags = local.tags
 }
